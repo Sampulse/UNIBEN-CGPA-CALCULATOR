@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGPA Calculator | Christian Diary</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="Christian Diary Logo">
+            <h1>CGPA Calculator</h1>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="cgpa-calculator.html">CGPA Calculator</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <h2>Calculate Your CGPA</h2>
+        <p>Enter your grades and credit units to calculate your CGPA instantly.</p>
+
+        <form id="cgpaForm">
+            <div id="courses">
+                <div class="course">
+                    <input type="text" name="course[]" placeholder="Course Name">
+                    <input type="number" name="unit[]" placeholder="Credit Unit" min="1">
+                    <select name="grade[]">
+                        <option value="">Select Grade</option>
+                        <option value="5">A</option>
+                        <option value="4">B</option>
+                        <option value="3">C</option>
+                        <option value="2">D</option>
+                        <option value="1">E</option>
+                        <option value="0">F</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" onclick="addCourse()">+ Add Course</button>
+            <button type="submit">Calculate CGPA</button>
+        </form>
+
+        <h3 id="result"></h3>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Christian Diary. All Rights Reserved.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        function addCourse() {
+            const courseDiv = document.createElement("div");
+            courseDiv.classList.add("course");
+            courseDiv.innerHTML = `
+                <input type="text" name="course[]" placeholder="Course Name">
+                <input type="number" name="unit[]" placeholder="Credit Unit" min="1">
+                <select name="grade[]">
+                    <option value="">Select Grade</option>
+                    <option value="5">A</option>
+                    <option value="4">B</option>
+                    <option value="3">C</option>
+                    <option value="2">D</option>
+                    <option value="1">E</option>
+                    <option value="0">F</option>
+                </select>
+            `;
+            document.getElementById("courses").appendChild(courseDiv);
+        }
+
+        document.getElementById("cgpaForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let units = document.getElementsByName("unit[]");
+            let grades = document.getElementsByName("grade[]");
+            let totalUnits = 0;
+            let totalPoints = 0;
+
+            for (let i = 0; i < units.length; i++) {
+                let unit = parseFloat(units[i].value);
+                let grade = parseFloat(grades[i].value);
+
+                if (!isNaN(unit) && !isNaN(grade)) {
+                    totalUnits += unit;
+                    totalPoints += unit * grade;
+                }
+            }
+
+            if (totalUnits > 0) {
+                let cgpa = (totalPoints / totalUnits).toFixed(2);
+                document.getElementById("result").textContent = "Your CGPA is: " + cgpa;
+            } else {
+                document.getElementById("result").textContent = "Please enter valid data.";
+            }
+        });
+    </script>
+
+</body>
+</html>
