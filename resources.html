@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Resources — CGPA Calculator</title>
+  <meta name="description" content="Useful resources for Nigerian university students — downloads, links, and tools." />
+  <link rel="stylesheet" href="styles.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=pub-3253581979430606" crossorigin="anonymous"></script>
+  <style>
+    .card{background:#fff;border-radius:8px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px}
+    .btn{display:inline-block;background:#004aad;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700;border:none;cursor:pointer}
+    .btn.secondary{background:#fff;color:#004aad;border:1px solid rgba(0,0,0,.12)}
+    .grid{display:flex;flex-wrap:wrap;gap:12px}
+    .tile{flex:1 1 260px;background:#fff;border:1px solid #eef5ff;border-radius:8px;padding:12px}
+    .muted{color:#666}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><h1>CGPA Calculator</h1></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cgpa-calculator.html">CGPA Calculator</a>
+      <a href="study-tips.html">Study Tips</a>
+      <a href="resources.html">Resources</a>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Resources</h2>
+    <p class="muted">Download a simple study planner and a past-questions checklist. Open the CSV in Excel or Google Sheets.</p>
+
+    <section class="card">
+      <button class="btn" onclick="downloadPlanner()">Download Study Planner (CSV)</button>
+      <button class="btn secondary" onclick="downloadChecklist()">Past-Questions Checklist (TXT)</button>
+    </section>
+
+    <section class="card">
+      <h3>Helpful Links</h3>
+      <div class="grid">
+        <div class="tile"><strong>JAMB</strong><br /><span class="muted">Admissions & UTME information.</span></div>
+        <div class="tile"><strong>NUC</strong><br /><span class="muted">Accreditation & policy updates.</span></div>
+        <div class="tile"><strong>Google Scholar</strong><br /><span class="muted">Find academic papers for projects.</span></div>
+        <div class="tile"><strong>University Portal</strong><br /><span class="muted">Course registration, results, materials.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 CGPA Calculator. All rights reserved.</p>
+    <a href="about.html">About</a> |
+    <a href="privacy.html">Privacy Policy</a>
+  </footer>
+
+  <script>
+    function downloadPlanner(){
+      const csv = [
+        ['Day','Time Slot','Course / Topic','Notes'],
+        ['Monday','07:00 - 09:00','',''],
+        ['Monday','10:00 - 12:00','',''],
+        ['Tuesday','07:00 - 09:00','',''],
+        ['Tuesday','10:00 - 12:00','',''],
+        ['Wednesday','07:00 - 09:00','',''],
+        ['Thursday','07:00 - 09:00','',''],
+        ['Friday','07:00 - 09:00','',''],
+        ['Saturday','09:00 - 12:00','',''],
+        ['Sunday','Plan / Review','']
+      ];
+      const csvContent = csv.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csvContent], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download='study-planner.csv';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+    function downloadChecklist(){
+      const txt = [
+        'Past Questions Checklist',
+        '',
+        '- Course: ______________________',
+        '- Years collected (e.g., 2019-2024): __________________',
+        '- Source (portal/library/senior): __________________',
+        '- Timed practice done: Yes / No',
+        '- Notes log updated: Yes / No',
+        '',
+        'Repeat for each course.'
+      ].join('\n');
+      const blob = new Blob([txt], {type:'text/plain;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download='past-questions-checklist.txt';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
