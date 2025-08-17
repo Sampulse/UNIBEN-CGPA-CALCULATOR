@@ -3,145 +3,240 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nigerian University CGPA Calculator</title>
+  <title>Nigerian CGPA Calculator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f4f6f8;
-    }
-    header {
-      text-align: center;
-      padding: 20px;
-      background: #2c3e50;
-      color: white;
-      border-radius: 8px;
-    }
-    .container {
-      max-width: 800px;
-      margin: 20px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    h2 {
-      margin-top: 40px;
-      color: #2c3e50;
-    }
-    .result {
-      background: #ecf0f1;
-      padding: 15px;
-      margin-top: 15px;
-      border-radius: 5px;
-      font-weight: bold;
-    }
-    .ads {
-      margin: 30px 0 0 0;
-      text-align: center;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 0; }
+    header { background: #0a3d62; color: #fff; text-align: center; padding: 1rem; }
+    main { max-width: 1000px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 8px;
+           box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    h2 { color: #0a3d62; }
+    .tabs { display: flex; margin-bottom: 1rem; }
+    .tab { flex: 1; padding: 10px; background: #ddd; text-align: center; cursor: pointer; border: 1px solid #bbb; }
+    .tab.active { background: #0a3d62; color: white; font-weight: bold; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: .75rem; text-align: center; }
+    th { background: #0a3d62; color: white; }
+    button { background: #0a3d62; color: white; padding: .6rem 1rem; border: none; border-radius: 4px; cursor: pointer; margin: 0.25rem; }
+    button:hover { background: #07406d; }
+    .result { margin-top: 1.5rem; padding: 1rem; background: #eaf4fc; border-left: 5px solid #0a3d62; }
+    select, input { padding: .4rem; border: 1px solid #ccc; border-radius: 4px; }
+    .export-buttons { margin-top: 1.5rem; }
   </style>
 </head>
 <body>
+  <header>
+    <h1>🎓 Nigerian CGPA Calculator</h1>
+    <p>Multi-Semester GPA + CGPA Tracker</p>
+  </header>
 
-<header>
-  <h1>Nigerian University CGPA Calculator</h1>
-</header>
+  <main>
+    <div class="tabs" id="tabs"></div>
+    <div id="tabContents"></div>
+    <button onclick="addSemester()">➕ Add Semester</button>
 
-<div class="container">
+    <div id="cgpaResult" class="result"></div>
 
-  <h2>Semester Courses</h2>
-  <form id="courseForm">
-    <input type="text" placeholder="Course Code" id="courseCode" required>
-    <input type="number" placeholder="Credit Units" id="courseUnits" required>
-    <select id="courseGrade" required>
-      <option value="">Grade</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-      <option value="D">D</option>
-      <option value="E">E</option>
-      <option value="F">F</option>
-    </select>
-    <button type="submit">Add Course</button>
-  </form>
+    <div class="export-buttons">
+      <button onclick="exportPDF()">📄 Export to PDF</button>
+      <button onclick="exportExcel()">📊 Export to Excel</button>
+    </div>
+  </main>
 
-  <table id="coursesTable" border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-top:20px; border-collapse:collapse;">
-    <thead>
-      <tr>
-        <th>Course Code</th>
-        <th>Units</th>
-        <th>Grade</th>
-        <th>Points</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <script>
+    const gradePoints = { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 };
+    let semesters = JSON.parse(localStorage.getItem("semesters")) || [];
 
-  <div id="gpaResult" class="result">GPA: 0.00</div>
-  <div id="cgpaResult" class="result">CGPA: 0.00</div>
+    function saveData() {
+      localStorage.setItem("semesters", JSON.stringify(semesters));
+      calculateCGPA();
+    }
 
-  <!-- ✅ Bottom AdSense Ad -->
-  <div class="ads">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3253581979430606"
-         crossorigin="anonymous"></script>
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-3253581979430606"
-         data-ad-slot="3672447198"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
-  </div>
+    function renderTabs() {
+      const tabs = document.getElementById("tabs");
+      const contents = document.getElementById("tabContents");
+      tabs.innerHTML = "";
+      contents.innerHTML = "";
 
-</div>
+      semesters.forEach((sem, i) => {
+        const tab = document.createElement("div");
+        tab.className = "tab" + (i === 0 ? " active" : "");
+        tab.innerText = `Semester ${i+1}`;
+        tab.onclick = () => switchTab(i);
+        tabs.appendChild(tab);
 
-<script>
-  const gradePoints = { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 };
-  let courses = [];
+        const content = document.createElement("div");
+        content.className = "tab-content" + (i === 0 ? " active" : "");
+        content.innerHTML = `
+          <h2>Semester ${i+1}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Credit Units</th>
+                <th>Grade</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="courseBody${i}">
+              ${sem.courses.map(c => `
+                <tr>
+                  <td><input type="text" value="${c.code}"></td>
+                  <td><input type="number" min="1" value="${c.units}"></td>
+                  <td>
+                    <select>
+                      ${Object.keys(gradePoints).map(g =>
+                        `<option ${c.grade===g?"selected":""}>${g}</option>`).join("")}
+                    </select>
+                  </td>
+                  <td><button onclick="removeCourse(${i}, this)">❌</button></td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
+          <button onclick="addCourse(${i})">➕ Add Course</button>
+          <button onclick="calculateGPA(${i})">📊 Calculate GPA</button>
+          <div class="result" id="result${i}">${sem.gpa ? `Semester GPA: ${sem.gpa} (${classify(sem.gpa)})` : ""}</div>
+        `;
+        contents.appendChild(content);
+      });
+    }
 
-  document.getElementById('courseForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const code = document.getElementById('courseCode').value;
-    const units = parseInt(document.getElementById('courseUnits').value);
-    const grade = document.getElementById('courseGrade').value;
-    const points = gradePoints[grade] * units;
+    function switchTab(index) {
+      document.querySelectorAll(".tab").forEach((tab, i) => {
+        tab.classList.toggle("active", i === index);
+      });
+      document.querySelectorAll(".tab-content").forEach((c, i) => {
+        c.classList.toggle("active", i === index);
+      });
+    }
 
-    courses.push({ code, units, grade, points });
-    updateTable();
-    updateResults();
+    function addSemester() {
+      semesters.push({ courses: [], gpa: null, totalUnits: 0, totalPoints: 0 });
+      saveData();
+      renderTabs();
+    }
 
-    this.reset();
-  });
+    function addCourse(semIndex) {
+      semesters[semIndex].courses.push({ code: "", units: 3, grade: "A" });
+      saveData();
+      renderTabs();
+      switchTab(semIndex);
+    }
 
-  function updateTable() {
-    const tbody = document.querySelector('#coursesTable tbody');
-    tbody.innerHTML = "";
-    courses.forEach(c => {
-      const row = `<tr>
-        <td>${c.code}</td>
-        <td>${c.units}</td>
-        <td>${c.grade}</td>
-        <td>${c.points}</td>
-      </tr>`;
-      tbody.innerHTML += row;
-    });
-  }
+    function removeCourse(semIndex, btn) {
+      const rowIndex = btn.parentElement.parentElement.rowIndex - 1;
+      semesters[semIndex].courses.splice(rowIndex, 1);
+      saveData();
+      renderTabs();
+      switchTab(semIndex);
+    }
 
-  function updateResults() {
-    let totalUnits = 0, totalPoints = 0;
-    courses.forEach(c => {
-      totalUnits += c.units;
-      totalPoints += c.points;
-    });
-    const gpa = totalPoints / (totalUnits || 1);
-    document.getElementById('gpaResult').innerText = "GPA: " + gpa.toFixed(2);
-    document.getElementById('cgpaResult').innerText = "CGPA: " + gpa.toFixed(2); 
-  }
-</script>
+    function calculateGPA(semIndex) {
+      const rows = document.querySelectorAll(`#courseBody${semIndex} tr`);
+      let totalUnits = 0, totalPoints = 0;
+      let updatedCourses = [];
 
+      rows.forEach(row => {
+        const code = row.children[0].querySelector("input").value;
+        const units = parseInt(row.children[1].querySelector("input").value);
+        const grade = row.children[2].querySelector("select").value;
+
+        totalUnits += units;
+        totalPoints += units * gradePoints[grade];
+        updatedCourses.push({ code, units, grade });
+      });
+
+      const gpa = (totalPoints / totalUnits).toFixed(2);
+      semesters[semIndex] = { courses: updatedCourses, gpa, totalUnits, totalPoints };
+      saveData();
+
+      document.getElementById(`result${semIndex}`).innerHTML =
+        `<strong>Semester GPA:</strong> ${gpa} (${classify(gpa)})`;
+    }
+
+    function calculateCGPA() {
+      let totalUnits = 0, totalPoints = 0;
+      semesters.forEach(sem => {
+        if (sem.totalUnits) {
+          totalUnits += sem.totalUnits;
+          totalPoints += sem.totalPoints;
+        }
+      });
+      if (totalUnits === 0) return;
+      const cgpa = (totalPoints / totalUnits).toFixed(2);
+      document.getElementById("cgpaResult").innerHTML = `
+        <h2>📊 Overall CGPA: ${cgpa} (${classify(cgpa)})</h2>
+        <em>Across ${semesters.length} semester(s)</em>
+      `;
+    }
+
+    function classify(gpa) {
+      gpa = parseFloat(gpa);
+      if (gpa >= 4.5) return "First Class Honours";
+      if (gpa >= 3.5) return "Second Class Upper";
+      if (gpa >= 2.5) return "Second Class Lower";
+      if (gpa >= 1.5) return "Third Class";
+      return "Pass / Fail";
+    }
+
+    // 📄 Export to PDF
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Nigerian CGPA Report", 70, 20);
+
+      let y = 30;
+      semesters.forEach((sem, i) => {
+        doc.text(`Semester ${i+1} - GPA: ${sem.gpa || "Not Calculated"}`, 14, y);
+        y += 6;
+        sem.courses.forEach(c => {
+          doc.text(`  ${c.code} | ${c.units} units | Grade: ${c.grade}`, 14, y);
+          y += 6;
+        });
+        y += 4;
+      });
+
+      let totalUnits = semesters.reduce((sum, s) => sum+s.totalUnits, 0);
+      let totalPoints = semesters.reduce((sum, s) => sum+s.totalPoints, 0);
+      let cgpa = totalUnits ? (totalPoints/totalUnits).toFixed(2) : "N/A";
+
+      doc.text(`Overall CGPA: ${cgpa} (${classify(cgpa)})`, 14, y+10);
+      doc.save("CGPA_Report.pdf");
+    }
+
+    // 📊 Export to Excel
+    function exportExcel() {
+      let wb = XLSX.utils.book_new();
+      semesters.forEach((sem, i) => {
+        let ws_data = [["Course Code", "Credit Units", "Grade"]];
+        sem.courses.forEach(c => {
+          ws_data.push([c.code, c.units, c.grade]);
+        });
+        ws_data.push([]);
+        ws_data.push(["GPA", sem.gpa || "Not Calculated"]);
+        let ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, `Semester ${i+1}`);
+      });
+
+      let totalUnits = semesters.reduce((sum, s) => sum+s.totalUnits, 0);
+      let totalPoints = semesters.reduce((sum, s) => sum+s.totalPoints, 0);
+      let cgpa = totalUnits ? (totalPoints/totalUnits).toFixed(2) : "N/A";
+
+      let summary = [["Overall CGPA", cgpa, classify(cgpa)]];
+      let ws_summary = XLSX.utils.aoa_to_sheet(summary);
+      XLSX.utils.book_append_sheet(wb, ws_summary, "Summary");
+
+      XLSX.writeFile(wb, "CGPA_Report.xlsx");
+    }
+
+    // Initialize
+    if (semesters.length === 0) addSemester();
+    else renderTabs();
+    calculateCGPA();
+  </script>
 </body>
 </html>
