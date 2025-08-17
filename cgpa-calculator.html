@@ -1,252 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CGPA Calculator — Compute Your CGPA</title>
-  <meta name="description" content="Nigerian University CGPA Calculator — multi-semester, accurate, mobile-friendly." />
-  <link rel="stylesheet" href="styles.css" />
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=pub-3253581979430606" crossorigin="anonymous"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nigerian University CGPA Calculator</title>
   <style>
-    .panel{background:#fff;border-radius:8px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:16px}
-    .small{color:#666}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-    .btn{background:#004aad;color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
-    .btn.ghost{background:#fff;color:#004aad;border:1px solid rgba(0,0,0,.1)}
-    .btn.warn{background:#f39c12}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{border:1px solid #e9eef4;padding:8px;text-align:center}
-    input[type="text"],input[type="number"],select{width:100%;padding:8px;border:1px solid #dfe8f2;border-radius:6px}
-    .results{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
-    .result-box{flex:1;min-width:180px;background:#f7fbff;padding:12px;border-radius:8px;border:1px solid #e6f0ff}
-    .result-box strong{display:block;font-size:1.3rem;color:#004aad}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f6f8;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      background: #2c3e50;
+      color: white;
+      border-radius: 8px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 40px;
+      color: #2c3e50;
+    }
+    .result {
+      background: #ecf0f1;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .ads {
+      margin: 30px 0 0 0;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo"><h1>CGPA Calculator</h1></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="cgpa-calculator.html">CGPA Calculator</a>
-      <a href="study-tips.html">Study Tips</a>
-      <a href="resources.html">Resources</a>
-      <a href="about.html">About</a>
-      <a href="privacy.html">Privacy</a>
-    </nav>
-  </header>
 
-  <main>
-    <h2>Compute Your CGPA</h2>
-    <p class="small">Grading scale (Nigeria): A=5 • B=4 • C=3 • D=2 • E=1 • F=0</p>
+<header>
+  <h1>Nigerian University CGPA Calculator</h1>
+</header>
 
-    <!-- Controls -->
-    <div class="panel">
-      <div class="controls">
-        <button class="btn" id="addSemesterBtn">+ Add Semester</button>
-        <button class="btn ghost" id="resetBtn">Reset All</button>
-        <button class="btn" id="calcBtn">Calculate CGPA</button>
-        <button class="btn ghost" id="downloadBtn">Download Result</button>
-        <button class="btn warn" id="helpBtn">How to use</button>
-      </div>
-    </div>
+<div class="container">
 
-    <!-- Semesters go here -->
-    <div id="semesters"></div>
+  <h2>Semester Courses</h2>
+  <form id="courseForm">
+    <input type="text" placeholder="Course Code" id="courseCode" required>
+    <input type="number" placeholder="Credit Units" id="courseUnits" required>
+    <select id="courseGrade" required>
+      <option value="">Grade</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+    </select>
+    <button type="submit">Add Course</button>
+  </form>
 
-    <!-- Results -->
-    <div class="panel">
-      <div class="results">
-        <div class="result-box">
-          <small class="small">Total Units</small>
-          <strong id="totalUnits">0</strong>
-        </div>
-        <div class="result-box">
-          <small class="small">Total Quality Points</small>
-          <strong id="totalQp">0</strong>
-        </div>
-        <div class="result-box">
-          <small class="small">Cumulative CGPA</small>
-          <strong id="cumCgpa">0.00</strong>
-        </div>
-      </div>
-      <div id="perSemesterResults" style="margin-top:10px"></div>
-    </div>
-  </main>
+  <table id="coursesTable" border="1" cellpadding="8" cellspacing="0" style="width:100%; margin-top:20px; border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Course Code</th>
+        <th>Units</th>
+        <th>Grade</th>
+        <th>Points</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <footer>
-    <p>&copy; 2025 CGPA Calculator. All rights reserved.</p>
-    <a href="about.html">About</a> |
-    <a href="privacy.html">Privacy Policy</a>
-  </footer>
+  <div id="gpaResult" class="result">GPA: 0.00</div>
+  <div id="cgpaResult" class="result">CGPA: 0.00</div>
 
-  <script>
-    (function(){
-      const semestersEl = document.getElementById('semesters');
-      const addSemesterBtn = document.getElementById('addSemesterBtn');
-      const resetBtn = document.getElementById('resetBtn');
-      const calcBtn = document.getElementById('calcBtn');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const helpBtn = document.getElementById('helpBtn');
+  <!-- ✅ Bottom AdSense Ad -->
+  <div class="ads">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3253581979430606"
+         crossorigin="anonymous"></script>
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-3253581979430606"
+         data-ad-slot="3672447198"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
 
-      const totalUnitsEl = document.getElementById('totalUnits');
-      const totalQpEl = document.getElementById('totalQp');
-      const cumCgpaEl = document.getElementById('cumCgpa');
-      const perSemesterResults = document.getElementById('perSemesterResults');
+</div>
 
-      let semCount = 0;
+<script>
+  const gradePoints = { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 };
+  let courses = [];
 
-      function createSemester(){
-        semCount++;
-        const semId = 'sem' + semCount;
-        const wrap = document.createElement('div');
-        wrap.className = 'panel';
-        wrap.id = semId;
-        wrap.innerHTML = `
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-            <div>
-              <div style="font-weight:700">Semester ${semCount} &nbsp; <span class="small" id="${semId}-summary"></span></div>
-              <div class="small">Enter Course Code, Units, and select Grade.</div>
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn ghost" data-action="addCourse">+ Add Course</button>
-              <button class="btn ghost" data-action="removeSemester">Remove</button>
-            </div>
-          </div>
-          <div style="overflow:auto;margin-top:10px">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:40%">Course Code</th>
-                  <th style="width:20%">Units</th>
-                  <th style="width:20%">Grade</th>
-                  <th style="width:20%">Quality Points</th>
-                </tr>
-              </thead>
-              <tbody class="course-body"></tbody>
-            </table>
-          </div>
-        `;
-        semestersEl.appendChild(wrap);
+  document.getElementById('courseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const code = document.getElementById('courseCode').value;
+    const units = parseInt(document.getElementById('courseUnits').value);
+    const grade = document.getElementById('courseGrade').value;
+    const points = gradePoints[grade] * units;
 
-        wrap.querySelector('[data-action="addCourse"]').addEventListener('click', ()=>{ addCourseRow(wrap); updateAll(); });
-        wrap.querySelector('[data-action="removeSemester"]').addEventListener('click', ()=>{ wrap.remove(); updateAll(); });
+    courses.push({ code, units, grade, points });
+    updateTable();
+    updateResults();
 
-        addCourseRow(wrap);
-        addCourseRow(wrap);
-      }
+    this.reset();
+  });
 
-      function addCourseRow(semEl, course='', units='', grade='A'){
-        const tbody = semEl.querySelector('.course-body');
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="text" class="course-code" placeholder="e.g. MTH101" value="${escapeHtml(course)}"></td>
-          <td><input type="number" class="units" min="0" step="1" placeholder="e.g. 3" value="${units}"></td>
-          <td>
-            <select class="grade">
-              <option value="5">A</option>
-              <option value="4">B</option>
-              <option value="3">C</option>
-              <option value="2">D</option>
-              <option value="1">E</option>
-              <option value="0">F</option>
-            </select>
-          </td>
-          <td class="qp">0</td>
-        `;
-        tbody.appendChild(tr);
-        tr.querySelector('.grade').value = gradeToPoints(grade);
-        tr.querySelector('.units').addEventListener('input', updateAll);
-        tr.querySelector('.grade').addEventListener('change', updateAll);
-        updateAll();
-      }
+  function updateTable() {
+    const tbody = document.querySelector('#coursesTable tbody');
+    tbody.innerHTML = "";
+    courses.forEach(c => {
+      const row = `<tr>
+        <td>${c.code}</td>
+        <td>${c.units}</td>
+        <td>${c.grade}</td>
+        <td>${c.points}</td>
+      </tr>`;
+      tbody.innerHTML += row;
+    });
+  }
 
-      function gradeToPoints(g){
-        const up = String(g).toUpperCase();
-        if(['A','B','C','D','E','F'].includes(up)){
-          return ({A:5,B:4,C:3,D:2,E:1,F:0})[up];
-        }
-        const n = parseFloat(g);
-        return isNaN(n) ? 0 : n;
-      }
+  function updateResults() {
+    let totalUnits = 0, totalPoints = 0;
+    courses.forEach(c => {
+      totalUnits += c.units;
+      totalPoints += c.points;
+    });
+    const gpa = totalPoints / (totalUnits || 1);
+    document.getElementById('gpaResult').innerText = "GPA: " + gpa.toFixed(2);
+    document.getElementById('cgpaResult').innerText = "CGPA: " + gpa.toFixed(2); 
+  }
+</script>
 
-      function updateAll(){
-        let totalUnits = 0, totalQp = 0;
-        perSemesterResults.innerHTML = '';
-        Array.from(semestersEl.children).forEach((semEl, i)=>{
-          const rows = Array.from(semEl.querySelectorAll('.course-body tr'));
-          let semUnits = 0, semQp = 0;
-          rows.forEach(r=>{
-            const u = parseFloat(r.querySelector('.units').value) || 0;
-            const gp = parseFloat(r.querySelector('.grade').value) || 0;
-            const qp = u * gp;
-            r.querySelector('.qp').textContent = qp ? qp.toFixed(2).replace(/\.00$/,'') : '0';
-            semUnits += u;
-            semQp += qp;
-          });
-          const sum = semEl.querySelector(`#${semEl.id}-summary`);
-          sum.textContent = semUnits>0 ? `Units: ${semUnits} • QP: ${semQp.toFixed(2).replace(/\.00$/,'')} • GPA: ${(semQp/semUnits).toFixed(2)}` : '';
-          totalUnits += semUnits;
-          totalQp += semQp;
-
-          const line = document.createElement('div');
-          line.style.padding='6px 0'; line.style.borderBottom='1px dashed #eef5ff';
-          line.innerHTML = `<strong>Semester ${i+1} GPA:</strong> ${semUnits>0 ? (semQp/semUnits).toFixed(2) : '0.00'} <span class="small"> (Units: ${semUnits})</span>`;
-          perSemesterResults.appendChild(line);
-        });
-
-        totalUnitsEl.textContent = totalUnits;
-        totalQpEl.textContent = totalQp.toFixed(2).replace(/\.00$/,'');
-        cumCgpaEl.textContent = totalUnits>0 ? (totalQp/totalUnits).toFixed(2) : '0.00';
-      }
-
-      function downloadResult(){
-        updateAll();
-        const data = { timestamp: new Date().toISOString(), semesters: [] };
-        Array.from(semestersEl.children).forEach((semEl, i)=>{
-          const rows = Array.from(semEl.querySelectorAll('.course-body tr'));
-          const sem = { semester: i+1, courses: [] };
-          rows.forEach(r=>{
-            const course = r.querySelector('.course-code').value || '';
-            const units = parseFloat(r.querySelector('.units').value) || 0;
-            const gp = parseFloat(r.querySelector('.grade').value) || 0;
-            const qp = units * gp;
-            sem.courses.push({ course, units, gp, qp });
-          });
-          data.semesters.push(sem);
-        });
-        data.summary = {
-          totalUnits: parseFloat(totalUnitsEl.textContent) || 0,
-          totalQp: parseFloat(totalQpEl.textContent) || 0,
-          cumulativeCgpa: parseFloat(cumCgpaEl.textContent) || 0
-        };
-        const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'cgpa-result.json';
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-      }
-
-      function escapeHtml(s){
-        return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]));
-      }
-
-      addSemesterBtn.addEventListener('click', createSemester);
-      resetBtn.addEventListener('click', ()=>{
-        if(confirm('Reset all semesters and courses?')){
-          semestersEl.innerHTML=''; semCount=0; createSemester(); updateAll();
-        }
-      });
-      calcBtn.addEventListener('click', ()=>{ updateAll(); cumCgpaEl.scrollIntoView({behavior:'smooth',block:'center'}); });
-      downloadBtn.addEventListener('click', downloadResult);
-      helpBtn.addEventListener('click', ()=>{ alert('Click “+ Add Semester”, then “+ Add Course” rows. Enter Units and select Grade for each course. Press “Calculate CGPA”.'); });
-
-      // init
-      createSemester(); updateAll();
-    })();
-  </script>
 </body>
 </html>
