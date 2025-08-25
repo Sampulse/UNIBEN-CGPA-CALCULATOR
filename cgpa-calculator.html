@@ -1,72 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CGPA Calculator – UNIBEN</title>
-  <meta name="description" content="UNIBEN CGPA Calculator – Easily calculate your GPA and CGPA using the Nigerian university grading system." />
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNIBEN CGPA Calculator</title>
+  <link rel="icon" type="image/png" href="favicon.png">
 
   <!-- Google AdSense Auto Ads -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3253581979430606"
      crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f9;
+      color: #333;
+    }
+    header {
+      background: #004080;
+      color: #fff;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #004080;
+    }
+    form {
+      margin-top: 1.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 0.8rem;
+      text-align: center;
+    }
+    button {
+      background: #004080;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      margin: 0.5rem 0.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0066cc;
+    }
+    .result {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #006600;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <div class="logo"><h1>UNIBEN CGPA Calculator</h1></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="cgpa-calculator.html">CGPA Calculator</a>
-      <a href="study-tips.html">Study Tips</a>
-      <a href="resources.html">Resources</a>
-      <a href="about.html">About</a>
-      <a href="privacy.html">Privacy</a>
-    </nav>
+    <h1>UNIBEN CGPA Calculator</h1>
+    <p>Calculate your GPA and CGPA easily</p>
   </header>
 
   <main>
-    <h2>Calculate Your CGPA</h2>
-    <p>Use this calculator to compute your GPA and CGPA using the UNIBEN (and Nigerian standard) grading system.</p>
+    <h2>Enter Your Courses</h2>
+    <form id="cgpaForm">
+      <table id="courseTable">
+        <thead>
+          <tr>
+            <th>Course Code</th>
+            <th>Credit Units</th>
+            <th>Grade</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="text" name="course[]" required></td>
+            <td><input type="number" name="unit[]" min="1" required></td>
+            <td>
+              <select name="grade[]">
+                <option value="5">A</option>
+                <option value="4">B</option>
+                <option value="3">C</option>
+                <option value="2">D</option>
+                <option value="1">E</option>
+                <option value="0">F</option>
+              </select>
+            </td>
+            <td><button type="button" onclick="removeRow(this)">X</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <button type="button" onclick="addRow()">Add Course</button>
+      <button type="button" onclick="calculateCGPA()">Calculate CGPA</button>
+    </form>
 
-    <!-- Inline Ad Unit -->
-    <div style="margin: 1rem 0; text-align:center;">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-3253581979430606"
-           data-ad-slot="6208440184"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>
-           (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-    </div>
-
-    <!-- Your calculator code here -->
-    <section>
-      <form id="cgpa-form">
-        <!-- Example -->
-        <label>Course Grade:</label>
-        <input type="text" placeholder="A, B, C, D, F" />
-        <label>Credit Units:</label>
-        <input type="number" placeholder="3" />
-        <button type="submit">Add</button>
-      </form>
-    </section>
+    <div id="result" class="result"></div>
   </main>
 
-  <footer>
-    <p>&copy; 2025 UNIBEN CGPA Calculator. All rights reserved.</p>
-    <a href="about.html">About</a> |
-    <a href="privacy.html">Privacy Policy</a>
-  </footer>
+  <!-- AdSense Ad Unit (Bottom of Page) -->
+  <div style="max-width:800px; margin:2rem auto; text-align:center;">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-3253581979430606"
+        data-ad-slot="6208440184"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
 
-  <!-- AdSense script repeated at bottom (best practice) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3253581979430606"
-     crossorigin="anonymous"></script>
+  <script>
+    function addRow() {
+      const table = document.getElementById("courseTable").getElementsByTagName("tbody")[0];
+      const newRow = table.insertRow();
+      newRow.innerHTML = `
+        <td><input type="text" name="course[]" required></td>
+        <td><input type="number" name="unit[]" min="1" required></td>
+        <td>
+          <select name="grade[]">
+            <option value="5">A</option>
+            <option value="4">B</option>
+            <option value="3">C</option>
+            <option value="2">D</option>
+            <option value="1">E</option>
+            <option value="0">F</option>
+          </select>
+        </td>
+        <td><button type="button" onclick="removeRow(this)">X</button></td>
+      `;
+    }
+
+    function removeRow(button) {
+      const row = button.parentNode.parentNode;
+      row.parentNode.removeChild(row);
+    }
+
+    function calculateCGPA() {
+      const units = document.getElementsByName("unit[]");
+      const grades = document.getElementsByName("grade[]");
+      let totalUnits = 0, totalPoints = 0;
+
+      for (let i = 0; i < units.length; i++) {
+        const unit = parseInt(units[i].value);
+        const grade = parseInt(grades[i].value);
+        if (!isNaN(unit) && !isNaN(grade)) {
+          totalUnits += unit;
+          totalPoints += unit * grade;
+        }
+      }
+
+      if (totalUnits > 0) {
+        const cgpa = (totalPoints / totalUnits).toFixed(2);
+        document.getElementById("result").textContent = "Your CGPA is: " + cgpa;
+      } else {
+        document.getElementById("result").textContent = "Please enter valid course details.";
+      }
+    }
+  </script>
 </body>
 </html>
