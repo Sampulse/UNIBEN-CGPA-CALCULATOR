@@ -3,178 +3,267 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UNIBEN CGPA Calculator</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Nigerian CGPA Calculator</title>
 
-  <!-- Google AdSense Auto Ads -->
+  <!-- ✅ Google AdSense (Auto Ads) -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3253581979430606"
      crossorigin="anonymous"></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f9;
-      color: #333;
-    }
-    header {
-      background: #004080;
-      color: #fff;
-      padding: 1rem;
-      text-align: center;
-    }
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    h1, h2 {
-      text-align: center;
-      color: #004080;
-    }
-    form {
-      margin-top: 1.5rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-    }
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-    th, td {
-      padding: 0.8rem;
-      text-align: center;
-    }
-    button {
-      background: #004080;
-      color: #fff;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      margin: 0.5rem 0.2rem;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0066cc;
-    }
-    .result {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-top: 1rem;
-      font-weight: bold;
-      color: #006600;
-    }
+    body { font-family: Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 0; }
+    header { background: #0a3d62; color: #fff; text-align: center; padding: 1rem; }
+    main { max-width: 1000px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 8px;
+           box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    h2 { color: #0a3d62; }
+    .tabs { display: flex; margin-bottom: 1rem; }
+    .tab { flex: 1; padding: 10px; background: #ddd; text-align: center; cursor: pointer; border: 1px solid #bbb; }
+    .tab.active { background: #0a3d62; color: white; font-weight: bold; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: .75rem; text-align: center; }
+    th { background: #0a3d62; color: white; }
+    button { background: #0a3d62; color: white; padding: .6rem 1rem; border: none; border-radius: 4px; cursor: pointer; margin: 0.25rem; }
+    button:hover { background: #07406d; }
+    .result { margin-top: 1.5rem; padding: 1rem; background: #eaf4fc; border-left: 5px solid #0a3d62; }
+    select, input { padding: .4rem; border: 1px solid #ccc; border-radius: 4px; }
+    .export-buttons { margin-top: 1.5rem; }
+    .ads-container { margin: 2rem auto; text-align: center; }
   </style>
 </head>
 <body>
   <header>
-    <h1>UNIBEN CGPA Calculator</h1>
-    <p>Calculate your GPA and CGPA easily</p>
+    <h1>🎓 Nigerian CGPA Calculator</h1>
+    <p>Multi-Semester GPA + CGPA Tracker</p>
   </header>
 
-  <main>
-    <h2>Enter Your Courses</h2>
-    <form id="cgpaForm">
-      <table id="courseTable">
-        <thead>
-          <tr>
-            <th>Course Code</th>
-            <th>Credit Units</th>
-            <th>Grade</th>
-            <th>Remove</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><input type="text" name="course[]" required></td>
-            <td><input type="number" name="unit[]" min="1" required></td>
-            <td>
-              <select name="grade[]">
-                <option value="5">A</option>
-                <option value="4">B</option>
-                <option value="3">C</option>
-                <option value="2">D</option>
-                <option value="1">E</option>
-                <option value="0">F</option>
-              </select>
-            </td>
-            <td><button type="button" onclick="removeRow(this)">X</button></td>
-          </tr>
-        </tbody>
-      </table>
-      <button type="button" onclick="addRow()">Add Course</button>
-      <button type="button" onclick="calculateCGPA()">Calculate CGPA</button>
-    </form>
-
-    <div id="result" class="result"></div>
-  </main>
-
-  <!-- AdSense Ad Unit (Bottom of Page) -->
-  <div style="max-width:800px; margin:2rem auto; text-align:center;">
+  <!-- ✅ AdSense Ad at the Top -->
+  <div class="ads-container">
     <ins class="adsbygoogle"
         style="display:block"
         data-ad-client="ca-pub-3253581979430606"
         data-ad-slot="6208440184"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
-    <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <main>
+    <div class="tabs" id="tabs"></div>
+    <div id="tabContents"></div>
+    <button onclick="addSemester()">➕ Add Semester</button>
+
+    <div id="cgpaResult" class="result"></div>
+
+    <div class="export-buttons">
+      <button onclick="exportPDF()">📄 Export to PDF</button>
+      <button onclick="exportExcel()">📊 Export to Excel</button>
+    </div>
+  </main>
+
+  <!-- ✅ AdSense Ad at the Bottom -->
+  <div class="ads-container">
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-3253581979430606"
+        data-ad-slot="6208440184"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 
   <script>
-    function addRow() {
-      const table = document.getElementById("courseTable").getElementsByTagName("tbody")[0];
-      const newRow = table.insertRow();
-      newRow.innerHTML = `
-        <td><input type="text" name="course[]" required></td>
-        <td><input type="number" name="unit[]" min="1" required></td>
-        <td>
-          <select name="grade[]">
-            <option value="5">A</option>
-            <option value="4">B</option>
-            <option value="3">C</option>
-            <option value="2">D</option>
-            <option value="1">E</option>
-            <option value="0">F</option>
-          </select>
-        </td>
-        <td><button type="button" onclick="removeRow(this)">X</button></td>
-      `;
+    const gradePoints = { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 };
+    let semesters = JSON.parse(localStorage.getItem("semesters")) || [];
+
+    function saveData() {
+      localStorage.setItem("semesters", JSON.stringify(semesters));
+      calculateCGPA();
     }
 
-    function removeRow(button) {
-      const row = button.parentNode.parentNode;
-      row.parentNode.removeChild(row);
+    function renderTabs() {
+      const tabs = document.getElementById("tabs");
+      const contents = document.getElementById("tabContents");
+      tabs.innerHTML = "";
+      contents.innerHTML = "";
+
+      semesters.forEach((sem, i) => {
+        const tab = document.createElement("div");
+        tab.className = "tab" + (i === 0 ? " active" : "");
+        tab.innerText = `Semester ${i+1}`;
+        tab.onclick = () => switchTab(i);
+        tabs.appendChild(tab);
+
+        const content = document.createElement("div");
+        content.className = "tab-content" + (i === 0 ? " active" : "");
+        content.innerHTML = `
+          <h2>Semester ${i+1}</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Credit Units</th>
+                <th>Grade</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="courseBody${i}">
+              ${sem.courses.map(c => `
+                <tr>
+                  <td><input type="text" value="${c.code}"></td>
+                  <td><input type="number" min="1" value="${c.units}"></td>
+                  <td>
+                    <select>
+                      ${Object.keys(gradePoints).map(g =>
+                        `<option ${c.grade===g?"selected":""}>${g}</option>`).join("")}
+                    </select>
+                  </td>
+                  <td><button onclick="removeCourse(${i}, this)">❌</button></td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
+          <button onclick="addCourse(${i})">➕ Add Course</button>
+          <button onclick="calculateGPA(${i})">📊 Calculate GPA</button>
+          <div class="result" id="result${i}">${sem.gpa ? `Semester GPA: ${sem.gpa} (${classify(sem.gpa)})` : ""}</div>
+        `;
+        contents.appendChild(content);
+      });
+    }
+
+    function switchTab(index) {
+      document.querySelectorAll(".tab").forEach((tab, i) => {
+        tab.classList.toggle("active", i === index);
+      });
+      document.querySelectorAll(".tab-content").forEach((c, i) => {
+        c.classList.toggle("active", i === index);
+      });
+    }
+
+    function addSemester() {
+      semesters.push({ courses: [], gpa: null, totalUnits: 0, totalPoints: 0 });
+      saveData();
+      renderTabs();
+    }
+
+    function addCourse(semIndex) {
+      semesters[semIndex].courses.push({ code: "", units: 3, grade: "A" });
+      saveData();
+      renderTabs();
+      switchTab(semIndex);
+    }
+
+    function removeCourse(semIndex, btn) {
+      const rowIndex = btn.parentElement.parentElement.rowIndex - 1;
+      semesters[semIndex].courses.splice(rowIndex, 1);
+      saveData();
+      renderTabs();
+      switchTab(semIndex);
+    }
+
+    function calculateGPA(semIndex) {
+      const rows = document.querySelectorAll(`#courseBody${semIndex} tr`);
+      let totalUnits = 0, totalPoints = 0;
+      let updatedCourses = [];
+
+      rows.forEach(row => {
+        const code = row.children[0].querySelector("input").value;
+        const units = parseInt(row.children[1].querySelector("input").value);
+        const grade = row.children[2].querySelector("select").value;
+
+        totalUnits += units;
+        totalPoints += units * gradePoints[grade];
+        updatedCourses.push({ code, units, grade });
+      });
+
+      const gpa = (totalPoints / totalUnits).toFixed(2);
+      semesters[semIndex] = { courses: updatedCourses, gpa, totalUnits, totalPoints };
+      saveData();
+
+      document.getElementById(`result${semIndex}`).innerHTML =
+        `<strong>Semester GPA:</strong> ${gpa} (${classify(gpa)})`;
     }
 
     function calculateCGPA() {
-      const units = document.getElementsByName("unit[]");
-      const grades = document.getElementsByName("grade[]");
       let totalUnits = 0, totalPoints = 0;
-
-      for (let i = 0; i < units.length; i++) {
-        const unit = parseInt(units[i].value);
-        const grade = parseInt(grades[i].value);
-        if (!isNaN(unit) && !isNaN(grade)) {
-          totalUnits += unit;
-          totalPoints += unit * grade;
+      semesters.forEach(sem => {
+        if (sem.totalUnits) {
+          totalUnits += sem.totalUnits;
+          totalPoints += sem.totalPoints;
         }
-      }
-
-      if (totalUnits > 0) {
-        const cgpa = (totalPoints / totalUnits).toFixed(2);
-        document.getElementById("result").textContent = "Your CGPA is: " + cgpa;
-      } else {
-        document.getElementById("result").textContent = "Please enter valid course details.";
-      }
+      });
+      if (totalUnits === 0) return;
+      const cgpa = (totalPoints / totalUnits).toFixed(2);
+      document.getElementById("cgpaResult").innerHTML = 
+        `<h2>📊 Overall CGPA: ${cgpa} (${classify(cgpa)})</h2>
+        <em>Across ${semesters.length} semester(s)</em>`;
     }
+
+    function classify(gpa) {
+      gpa = parseFloat(gpa);
+      if (gpa >= 4.5) return "First Class Honours";
+      if (gpa >= 3.5) return "Second Class Upper";
+      if (gpa >= 2.5) return "Second Class Lower";
+      if (gpa >= 1.5) return "Third Class";
+      return "Pass / Fail";
+    }
+
+    // Export to PDF
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Nigerian CGPA Report", 70, 20);
+
+      let y = 30;
+      semesters.forEach((sem, i) => {
+        doc.text(`Semester ${i+1} - GPA: ${sem.gpa || "Not Calculated"}`, 14, y);
+        y += 6;
+        sem.courses.forEach(c => {
+          doc.text(` ${c.code} | ${c.units} units | Grade: ${c.grade}`, 14, y);
+          y += 6;
+        });
+        y += 4;
+      });
+
+      let totalUnits = semesters.reduce((sum, s) => sum+s.totalUnits, 0);
+      let totalPoints = semesters.reduce((sum, s) => sum+s.totalPoints, 0);
+      let cgpa = totalUnits ? (totalPoints/totalUnits).toFixed(2) : "N/A";
+
+      doc.text(`Overall CGPA: ${cgpa} (${classify(cgpa)})`, 14, y+10);
+      doc.save("CGPA_Report.pdf");
+    }
+
+    // Export to Excel
+    function exportExcel() {
+      let wb = XLSX.utils.book_new();
+      semesters.forEach((sem, i) => {
+        let ws_data = [["Course Code", "Credit Units", "Grade"]];
+        sem.courses.forEach(c => {
+          ws_data.push([c.code, c.units, c.grade]);
+        });
+        ws_data.push([]);
+        ws_data.push(["GPA", sem.gpa || "Not Calculated"]);
+        let ws = XLSX.utils.aoa_to_sheet(ws_data);
+        XLSX.utils.book_append_sheet(wb, ws, `Semester ${i+1}`);
+      });
+
+      let totalUnits = semesters.reduce((sum, s) => sum+s.totalUnits, 0);
+      let totalPoints = semesters.reduce((sum, s) => sum+s.totalPoints, 0);
+      let cgpa = totalUnits ? (totalPoints/totalUnits).toFixed(2) : "N/A";
+
+      let summary = [["Overall CGPA", cgpa, classify(cgpa)]];
+      let ws_summary = XLSX.utils.aoa_to_sheet(summary);
+      XLSX.utils.book_append_sheet(wb, ws_summary, "Summary");
+
+      XLSX.writeFile(wb, "CGPA_Report.xlsx");
+    }
+
+    // Initialize
+    if (semesters.length === 0) addSemester();
+    else renderTabs();
+    calculateCGPA();
   </script>
 </body>
 </html>
